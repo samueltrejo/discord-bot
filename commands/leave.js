@@ -9,6 +9,8 @@ module.exports.run = async (client, message, args) => {
   
   const queue = client.server.getUncompleteQueueByType(queueType);
 
+  if (!queue) return;
+
   if (queue.players.includes(member)) {
     queue.players = queue.players.filter(player => player !== member);
     client.server.playersQueued = client.server.playersQueued.filter(player => player !== member);
@@ -23,7 +25,7 @@ module.exports.run = async (client, message, args) => {
       const embed = new Discord.RichEmbed()
         .setAuthor(queue.name, 'https://i.imgur.com/radG4jv.png')
         .setDescription(`${message.author.username} has left.`)
-        .setFooter(queue.players.length === 1 ? ('There is 1 player in the queue.') : (`There are ${queue.players.length} players in the queue.`));
+        .setFooter(queue.players.length === 1 ? (`There is 1 player in the queue out of ${queue.size}.`) : (`There are ${queue.players.length} players in the queue out of ${queue.size}.`));
       message.channel.send(embed);
     }
 
