@@ -10,8 +10,8 @@ module.exports.run = async (client, message, args) => {
   
   const queue = client.server.createQueue(queueType);
 
-  if (queue.players.length === 0 && queue.strictSize && args[1] && client.server.lobbyTypes[args[1]]) {
-    queue.size = client.server.lobbyTypes[args[1]];
+  if (queue.players.length === 0 && !queue.strictSize && args[0] && client.server.lobbyTypes[args[0]]) {
+    queue.size = client.server.lobbyTypes[args[0]];
   }
 
   queue.players.push(member);
@@ -20,7 +20,7 @@ module.exports.run = async (client, message, args) => {
   const queueInfoEmbed = new Discord.RichEmbed()
     .setAuthor(`${queue.name}`, 'https://i.imgur.com/radG4jv.png')
     .addField(`${message.author.username} has joined.`,
-      queue.players.length === 1 ? ('There is 1 player in the queue.') : (`There are ${queue.players.length} players in the queue.`))
+      queue.players.length === 1 ? (`There is 1 player in the queue out of ${queue.size}.`) : (`There are ${queue.players.length} players in the queue out of ${queue.size}.`))
     .setFooter('Type !q to join the lobby.');
   message.channel.send(queueInfoEmbed);
 
