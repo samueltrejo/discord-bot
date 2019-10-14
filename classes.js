@@ -28,8 +28,8 @@ class Server {
         defaultSize: 5,
         strictSize: true,
       },
-      boxgolf: {
-        gamemode: 'Box Golf',
+      freestyle: {
+        gamemode: 'Freestyle Only',
         sizeName: 'duel',
         defaultSize: 2,
         strictSize: false,
