@@ -1,0 +1,18 @@
+{
+  "games": [
+    {
+      "name": "Rocket League",
+      "category": "rocket league",
+      "nickname": "rl",
+      "gamemodes": ["Standard", "Freestyle", "Boomer", "FreeForAll", "HeatSeeker", "Custom"],
+      "maxPlayers": 8
+    },
+    {
+      "name": "Rocket League",
+      "category": "staff",
+      "nickname": "stf",
+      "gamemodes": ["Standard", "Freestyle", "Boomer", "FreeForAll", "HeatSeeker", "Custom"],
+      "maxPlayers": 8
+    }
+  ]
+}
