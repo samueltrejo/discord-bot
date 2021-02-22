@@ -102,28 +102,26 @@ module.exports = class Lobby {
   }
 
   async createChannels (reaction) {
+    const Channel = require('./channel');
     const category = reaction.message.channel.parent;
 
     if (this.size === 2) {
       const channel = await reaction.message.guild.channels.create(this.name, {type: 'voice', parent: category});
-      channel.timer = 10;
-      this.channels.push(channel);
+      this.channels.push(new Channel(channel.id));
     } else if (this.size > 2) {
       const channelA = await reaction.message.guild.channels.create(this.name + ' A', {type: 'voice', parent: category});
       const channelB = await reaction.message.guild.channels.create(this.name + ' B', {type: 'voice', parent: category});
-      channelA.timer = 10;
-      channelB.timer = 10;
-      this.channels.push(channelA, channelB);
+      this.channels.push(new Channel(channelA.id), new Channel(channelB.id));
     }
   }
 
   checkChannels = () => {
-    if (this.stage < 4) {
-      this.channels = channels.filter((channel) => !channel.deleted);
-      if (!this.channels.length) {
+    if (this.stage === 4) {
+      const channels = this.channels.filter(channel => !channel.deleted);
+      if (!channels.length) {
         this.stage = 5;
       }
     }
-
   }
+
 }

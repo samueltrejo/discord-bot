@@ -105,27 +105,32 @@ module.exports = class Server {
     })
   }
 
-  deleteChannelsCheck = () => {
+  deleteChannelsCheck = (client) => {
     this.games.forEach((game) => {
 
       game.completeLobbies.forEach((lobby) => {
-        lobby.checkChannels();
+        if (lobby.stage !== 5) {
+          lobby.checkChannels();
+  
+          lobby.channels.forEach((channel) => {
+            if (!channel.deleted) {
+              const discordChnl = client.channels.fetch(channel.id);
 
-        lobby.channels.forEach((channel) => {
-          if (channel.deleted) return;
+              if (discordChnl.members.length > 0) {
+                channel.timer = 600;
+              } else {
+                channel.timer -= 1;
+              }
 
-          if (channel.members.length > 0) {
-            channel.timer = 10;
-          } else {
-            channel.timer -= 1;
-          }
+              if (channel.timer <= 0) {
+                channel.delete();
+              }
+            }
+          });
 
-          if (channel.timer <= 0) {
-            channel.delete();
-          }
-
-        });
+        }
       });
+      
     });
   }
 }

@@ -16,8 +16,9 @@ module.exports = class Game {
   getLobby = lobbyId => this.activeLobbies.find(lobby => lobby.id === lobbyId);
 
   completeLobby = (lobbyId) => {
-    this.completeLobbies = this.activeLobbies.filter((lobby) => lobby.id === lobbyId);
-    this.activeLobbies = this.activeLobbies.filter((lobby) => lobby.id !== lobbyId);
+    const lobby = this.activeLobbies.find(lobby => lobby.id === lobbyId);
+    this.activeLobbies = this.activeLobbies.filter(lobby => lobby.id !== lobbyId);
+    this.completeLobbies.push(lobby);
   }
 
   clearLobbies = () => this.completeLobbies = this.completeLobbies.filter(lobby => lobby.stage !== 5);
