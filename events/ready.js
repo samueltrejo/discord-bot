@@ -6,7 +6,7 @@ module.exports = {
     firebase.init();
     games = await firebase.get('games');
     client.server = new Server(client, games);
-    client.server.channelsInterval = setInterval(client.server.deleteChannelsCheck, 1000);
-    console.error('ready');
+    client.server.channelsInterval = setInterval(client.server.deleteChannelsCheck.bind(null, client), 1000);
+    console.error(client.config.message.info);
   }
 }

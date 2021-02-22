@@ -19,4 +19,8 @@ for (const file of eventFiles) {
   client.on(event.name, event.execute.bind(null, client));
 }
 
-client.login(client.config.token);
+if (client.config.maintenance) {
+  console.log(client.config.message.error);
+} else {
+  client.login(client.config.token);
+}

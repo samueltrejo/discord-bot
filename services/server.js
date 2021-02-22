@@ -105,17 +105,20 @@ module.exports = class Server {
     })
   }
 
-  deleteChannelsCheck = () => {
+  deleteChannelsCheck = (client) => {
     this.games.forEach((game) => {
 
       game.completeLobbies.forEach((lobby) => {
+        if (lobby.stage === 5) break;
         lobby.checkChannels();
 
         lobby.channels.forEach((channel) => {
-          if (channel.deleted) return;
+          if (channel.deleted) break;
 
-          if (channel.members.length > 0) {
-            channel.timer = 10;
+          const discordChnl = client.channels.fetch(channel.id);
+
+          if (discordChnl.members.length > 0) {
+            channel.timer = 600;
           } else {
             channel.timer -= 1;
           }
