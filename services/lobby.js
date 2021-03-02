@@ -2,6 +2,7 @@ const message = require("../events/message");
 
 module.exports = class Lobby {
   id;
+  message;
   players = [];
   channels = [];
   time = 60;
@@ -10,10 +11,24 @@ module.exports = class Lobby {
   gamemode;
   size;
   name;
+  timer = 300;
 
-  constructor (author, messageId) {
+  constructor (author, message) {
     this.author = author;
-    this.id = messageId;
+    this.id = message.id;
+    this.message = message;
+  }
+
+  isPlayerQueuedOrAuthor = (player) => {
+    if (this.author == player) return true;
+    if (this.players.includes(player)) return true;
+    return false;
+  }
+
+  isPlayerQueuedOrOtherAuthor = (player, lobbyId) => {
+    if (this.author == player && this.id !== lobbyId) return true;
+    if (this.players.includes(player)) return true;
+    return false;
   }
 
   getRandomNum = () => Math.floor(Math.random() * 8999) + 1000;
@@ -122,6 +137,25 @@ module.exports = class Lobby {
         this.stage = 5;
       }
     }
+  }
+
+  cancel = () => {
+    this.stage = 6;
+    const embed = this.message.embeds[0];
+    embed.fields = [];
+    embed.setColor('#c94a53');
+    embed.setDescription(
+      `This lobby has been canceled. Lobby creation never finiished or not all players joined in time.
+      
+      Lobby must be created and all players must join within 5 minutes.`);
+    embed.setFooter('This message will self destruct in 1 minute.');
+    this.message.edit(embed).then((message) => {
+      message.reactions.removeAll();
+      setTimeout(() => {
+        message.delete();
+        this.isError = false;
+      }, 60 * 1000);
+    });
   }
 
 }

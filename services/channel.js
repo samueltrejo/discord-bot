@@ -9,5 +9,6 @@ module.exports = class Channel {
 
   delete = (channel) => {
     channel.delete();
+    this.deleted = true;
   }
 }

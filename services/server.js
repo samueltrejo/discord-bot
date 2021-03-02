@@ -21,11 +21,22 @@ module.exports = class Server {
 
   getGame = name => this.games.find(game => game.name === name);
 
+  isLobbyStartBlocked = (game, player) => {
+    if (game.activeLobbies.filter((lobby) => lobby.isPlayerQueuedOrAuthor(player)).length) return true;
+    return false;
+  }
+
+  isQueueLobbyBlocked = (game, player, lobbyId) => {
+    if (game.activeLobbies.filter((lobby) => lobby.isPlayerQueuedOrOtherAuthor(player, lobbyId)).length) return true;
+    return false;
+  }
+
   startLobby = (message) => {
     const game = this.getGame(message.channel.parent.name);
 
     if (!game) return;
-    if (game.activeLobbies.filter((lobby) => lobby.author == message.author).length) return;
+
+    if (this.isLobbyStartBlocked(game, message.author)) return;
 
     if (game.activeLobbies.length >= 3 && !this.isError) {
       this.isError = true;
@@ -50,7 +61,12 @@ module.exports = class Server {
       } else if (lobby.stage === 2 && eventName === 'messageReactionAdd') {
         lobby.selectSize(reaction, user, this.emojis);
       } else if (lobby.stage === 3 && eventName === 'messageReactionAdd') {
-        lobby.joinLobby(reaction, user, game.info);
+        if (this.isQueueLobbyBlocked(game, user, reaction.message.id)) {
+          reaction.users.remove(user.id);
+          return;
+        } else {
+          lobby.joinLobby(reaction, user, game.info);
+        }
       } else if (lobby.stage === 3 && eventName === 'messageReactionRemove') {
         lobby.leaveLobby(reaction, user);
       }
@@ -92,7 +108,7 @@ module.exports = class Server {
       game.info.gamemodes.forEach((gamemode, index) => {
         message.react(this.emojis.letters[index]);
       });
-      game.createLobby(messageRef.author, message.id);
+      game.createLobby(messageRef.author, message);
     });
   }
 
@@ -108,26 +124,38 @@ module.exports = class Server {
   deleteChannelsCheck = (client) => {
     this.games.forEach((game) => {
 
+      game.activeLobbies.forEach((lobby) => {
+        if (lobby.stage < 4) {
+          lobby.timer -= 1;
+          if (lobby.timer <= 0) {
+            game.cancelLobby(lobby);
+          }
+        }
+      });
+
       game.completeLobbies.forEach((lobby) => {
-        if (lobby.stage !== 5) {
-          lobby.checkChannels();
+        if (lobby.stage === 4) {
   
           lobby.channels.forEach((channel) => {
             if (!channel.deleted) {
-              const discordChnl = client.channels.fetch(channel.id);
+              
+              client.channels.fetch(channel.id).then((discordChnl) => {
+                console.log(channel.timer, discordChnl.members.length);
+                if (discordChnl.members.array().length > 0) {
+                  channel.timer = 600;
+                } else {
+                  channel.timer -= 1;
+                }
+  
+                if (channel.timer <= 0) {
+                  channel.delete(discordChnl);
+                }
+              });
 
-              if (discordChnl.members.length > 0) {
-                channel.timer = 600;
-              } else {
-                channel.timer -= 1;
-              }
-
-              if (channel.timer <= 0) {
-                channel.delete();
-              }
             }
           });
 
+          lobby.checkChannels();
         }
       });
       
