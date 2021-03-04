@@ -15,7 +15,7 @@ if (process.env.token) {
 }
 
 if (process.env.maintenance) {
-  config.maintenance = process.env.maintenance;
+  config.maintenance = process.env.maintenance === 'false';
 }
 
 module.exports = config;
