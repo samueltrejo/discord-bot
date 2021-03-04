@@ -36,7 +36,10 @@ module.exports = class Server {
 
     if (!game) return;
 
-    if (this.isLobbyStartBlocked(game, message.author)) return;
+    if (this.isLobbyStartBlocked(game, message.author)) {
+      message.delete();
+      return;
+    };
 
     if (game.activeLobbies.length >= 3 && !this.isError) {
       this.isError = true;
