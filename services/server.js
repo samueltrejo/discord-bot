@@ -8,7 +8,8 @@ module.exports = class Server {
   defaultCategories = ['important', 'general', 'staff'];
   emojis = {
     numbers: ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'],
-    letters: ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺', '🇻', '🇼', '🇽', '🇾', '🇿']
+    letters: ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺', '🇻', '🇼', '🇽', '🇾', '🇿'],
+    cancel: '❌'
   }
 
   constructor(client, games) {
@@ -59,7 +60,9 @@ module.exports = class Server {
 
     const lobby = game.getLobby(reaction.message.id);
     if (lobby) {
-      if (lobby.stage === 1 && eventName === 'messageReactionAdd') {
+      if (user === lobby.author && reaction.emoji.name === this.emojis.cancel) {
+        game.cancelLobby(lobby, 2);
+      } else if (lobby.stage === 1 && eventName === 'messageReactionAdd') {
         lobby.selectGamemode(reaction, user, game.info, this.emojis);
       } else if (lobby.stage === 2 && eventName === 'messageReactionAdd') {
         lobby.selectSize(reaction, user, this.emojis);
@@ -111,6 +114,7 @@ module.exports = class Server {
       game.info.gamemodes.forEach((gamemode, index) => {
         message.react(this.emojis.letters[index]);
       });
+      message.react(this.emojis.cancel);
       game.createLobby(messageRef.author, message);
     });
   }
@@ -131,7 +135,7 @@ module.exports = class Server {
         if (lobby.stage < 4) {
           lobby.timer -= 1;
           if (lobby.timer <= 0) {
-            game.cancelLobby(lobby);
+            game.cancelLobby(lobby, 1);
           }
         }
       });
