@@ -21,8 +21,8 @@ module.exports = class Game {
     this.completeLobbies.push(lobby);
   }
 
-  cancelLobby = (lobby) => {
-    lobby.cancel();
+  cancelLobby = (lobby, reason) => {
+    lobby.cancel(reason);
     this.completeLobby(lobby.id);
   }
 

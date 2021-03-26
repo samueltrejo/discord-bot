@@ -15,7 +15,8 @@ if (process.env.token) {
 }
 
 if (process.env.maintenance) {
-  config.maintenance = process.env.maintenance === 'false';
+  config.maintenance = process.env.maintenance === 'true';
+  console.log('maintenance mode is set to ' + process.env.maintenance);
 }
 
 module.exports = config;

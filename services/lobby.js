@@ -48,6 +48,7 @@ module.exports = class Lobby {
         sizeEmojis.forEach((emoji) => {
           message.react(emoji);
         });
+        message.react(emojis.cancel);
       });
 
       this.stage = 2;
@@ -70,6 +71,7 @@ module.exports = class Lobby {
       reaction.message.edit(embed).then((message) => {
         message.reactions.removeAll();
         message.react('☑️');
+        message.react(emojis.cancel);
       });
 
       this.stage = 3;
@@ -139,15 +141,20 @@ module.exports = class Lobby {
     }
   }
 
-  cancel = () => {
+  cancel = (reason) => {
     this.stage = 6;
     const embed = this.message.embeds[0];
     embed.fields = [];
     embed.setColor('#c94a53');
-    embed.setDescription(
-      `This lobby has been canceled. Lobby creation never finiished or not all players joined in time.
-      
-      Lobby must be created and all players must join within 5 minutes.`);
+    if (reason === 1) {
+      embed.setDescription(
+        `This lobby has been canceled. Lobby creation never finished or not all players joined in time.
+        
+        Lobby must be created and all players must join within 5 minutes.`);
+    } else if (reason === 2) {
+      embed.setDescription(
+        `This lobby was canceled by the host.`);
+    }
     embed.setFooter('This message will self destruct in 1 minute.');
     this.message.edit(embed).then((message) => {
       message.reactions.removeAll();
