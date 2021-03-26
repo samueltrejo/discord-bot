@@ -48,6 +48,7 @@ module.exports = class Lobby {
         sizeEmojis.forEach((emoji) => {
           message.react(emoji);
         });
+        message.react(emojis.cancel);
       });
 
       this.stage = 2;
@@ -70,6 +71,7 @@ module.exports = class Lobby {
       reaction.message.edit(embed).then((message) => {
         message.reactions.removeAll();
         message.react('☑️');
+        message.react(emojis.cancel);
       });
 
       this.stage = 3;
